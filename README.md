@@ -127,6 +127,9 @@ Paso 5: Ejecutar la aplicación
 ```
 
 La aplicación estará disponible en: `http://localhost:8080`
+Sin embargo, se mostrará una pantalla de "Whitelabel Error Page",
+esto se debe a que no hay interfaz gráfica.
+A lo que se puede acceder son los endpoints, como por ejemplo: `http://localhost:8080/api/muebles`
 
 Ejecutar Tests
 ```bash
@@ -148,6 +151,28 @@ Ejecutar Tests
 
 API REST - Endpoints
 
+### Usar Thunder Client en Visual Studio Code (Recomendado)
+
+#### Paso 1: Instalar Thunder Client
+1. Abre Visual Studio Code
+2. Presiona `Ctrl + Shift + X` para abrir las extensiones
+3. Busca **"Thunder Client"**
+4. Haz click en **Install**
+
+#### Paso 2: Crear una petición
+1. Haz click en el icono del rayo en la barra lateral izquierda
+2. Click en **"New Request"**
+3. Configura la petición:
+   - **Método**: Selecciona GET, POST, PUT o DELETE según la operación
+   - **URL**: `http://localhost:8080/api/muebles`
+4. Para peticiones POST/PUT:
+   - Ve a la pestaña **"Body"**
+   - Selecciona **"JSON"**
+   - Pega el contenido JSON
+5. Click en **"Send"**
+
+#### Paso 3: Realizar peticiones en Thunder Client, estas son las peticiones que se pueden hacer:
+
 Muebles
 ```
 GET    /api/muebles              - Listar todos los muebles
@@ -155,7 +180,7 @@ GET    /api/muebles/{id}         - Obtener mueble por ID
 GET    /api/muebles/activos      - Listar muebles activos
 GET    /api/muebles/tipo/{tipo}  - Buscar por tipo
 POST   /api/muebles              - Crear nuevo mueble
-PUT    /api/muebles/{id}         - Actualizar mueble
+PUT    /api/muebles/{id}         - Actualizar mueble (Para activar mueble: /api/muebles/{id}/activar)
 DELETE /api/muebles/{id}         - Desactivar mueble
 ```
 
@@ -164,7 +189,7 @@ Variantes
 GET    /api/variantes            - Listar todas las variantes
 GET    /api/variantes/{id}       - Obtener variante por ID
 POST   /api/variantes            - Crear nueva variante
-PUT    /api/variantes/{id}       - Actualizar variante
+PUT    /api/variantes/{id}       - Actualizar variante (Para activar variante: /api/variantes/{id}/activar)
 DELETE /api/variantes/{id}       - Eliminar variante
 ```
 
@@ -179,7 +204,9 @@ POST   /api/cotizaciones/{id}/detalles      - Agregar mueble a cotización
 PUT    /api/cotizaciones/{id}/confirmar     - Confirmar venta
 ```
 
-Ejemplos de uso con cURL
+#### Paso 4: Click en Send
+
+Ejemplos de uso con cURL (Comandos en la terminal)
 
 Crear un mueble:
 ```bash
