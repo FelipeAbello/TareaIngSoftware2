@@ -25,21 +25,8 @@ El proyecto se orquesta mediante `docker-compose`, levantando 3 servicios interc
 2.  **`backend`**: API RESTful con lógica de negocio (Puerto 8080).
 3.  **`frontend`**: Interfaz de Usuario servida por Nginx (Puerto 3000).
 
-### Estructura de Directorios
-```text
-Felipe_Abello_Evaluacion3/
-├── backend/                # Código Fuente Java Spring Boot
-│   ├── src/
-│   ├── Dockerfile          # Configuración de imagen Java 21
-│   └── pom.xml
-├── frontend/               # Código Fuente Interfaz Web
-│   ├── index.html          # Catálogo y Carrito (Cliente)
-│   ├── admin.html          # Panel de Gestión CRUD (Administrador)
-│   └── Dockerfile          # Configuración de imagen Nginx
-├── docker-compose.yml      # Orquestación de servicios
-└── README.md               # Documentación
+##Instrucciones de Ejecución y Despliegue
 
-Instrucciones de Ejecución y Despliegue
 Requisitos Previos
 Tener Docker Desktop instalado y corriendo.
 
@@ -56,3 +43,55 @@ Acceso a la Aplicación
 Frontend (Cliente & Admin): http://localhost:3000
 
 Backend (API - JSON): http://localhost:8080/api/muebles
+
+---
+
+##Manual de usuario:
+
+Modo Cliente (Catálogo y Compras)
+Al ingresar a localhost:3000, verá el catálogo de muebles ACTIVOS.
+
+Puede agregar productos al Carrito de Compras (barra lateral derecha).
+
+Al presionar "CONFIRMAR VENTA", el sistema:
+
+Genera una cotización en el backend.
+
+Verifica si hay stock suficiente.
+
+Descuenta el stock real de la base de datos.
+
+Confirma la compra.
+
+Modo Administrador (Gestión de Stock)
+En la página principal, haga clic en el botón flotante "PANEL ADMIN".
+
+Contraseña de acceso: admin123
+
+Funcionalidades:
+
+Crear: Formulario para registrar nuevos muebles.
+
+Leer: Tabla con el inventario completo (incluyendo inactivos).
+
+Actualizar: Botón "EDITAR" para modificar precio, stock o nombre.
+
+Borrado Lógico: Botón para "DESACTIVAR" muebles (no los borra, solo los oculta del cliente).
+
+Reactivación: Posibilidad de volver a "ACTIVAR" muebles previamente desactivados.
+
+---
+
+### Estructura de Directorios
+```text
+Felipe_Abello_Evaluacion3/
+├── backend/                # Código Fuente Java Spring Boot
+│   ├── src/
+│   ├── Dockerfile          # Configuración de imagen Java 21
+│   └── pom.xml
+├── frontend/               # Código Fuente Interfaz Web
+│   ├── index.html          # Catálogo y Carrito (Cliente)
+│   ├── admin.html          # Panel de Gestión CRUD (Administrador)
+│   └── Dockerfile          # Configuración de imagen Nginx
+├── docker-compose.yml      # Orquestación de servicios
+└── README.md               # Documentación
