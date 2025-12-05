@@ -2,45 +2,222 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mueblería los Muebles Hermanos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mueblería Los Muebles Hermanos S.A.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .mueble-card { border: 1px solid #ccc; padding: 10px; margin: 10px; border-radius: 8px; }
-        .precio { color: green; font-weight: bold; }
+        :root {
+            --bg-color: #050505; --card-bg: #121212; 
+            --neon-cyan: #00f3ff; --neon-purple: #bc13fe; --neon-green: #00ff00;
+            --text-main: #ffffff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg-color); color: var(--text-main); font-family: 'Rajdhani', sans-serif;
+            background-image: linear-gradient(rgba(188, 19, 254, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(188, 19, 254, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #main-area { flex: 1; padding: 20px; overflow-y: auto; }
+        #cart-area { width: 350px; background: #000; border-left: 2px solid var(--neon-purple); display: flex; flex-direction: column; padding: 20px; box-shadow: -5px 0 20px rgba(188, 19, 254, 0.2); }
+
+        h1 { font-family: 'Orbitron', sans-serif; text-align: center; color: var(--text-main); text-shadow: 0 0 10px var(--neon-cyan); margin-bottom: 30px; }
+
+        #catalogo { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        
+        .mueble-card {
+            background-color: var(--card-bg); border: 1px solid var(--neon-cyan); border-radius: 5px; padding: 15px;
+            transition: 0.3s; position: relative;
+        }
+        .mueble-card:hover { transform: translateY(-3px); box-shadow: 0 0 15px var(--neon-cyan); }
+        .mueble-card h3 { color: var(--neon-cyan); font-family: 'Orbitron', sans-serif; margin-bottom: 5px; }
+        .precio { color: #fff; font-size: 1.5rem; font-weight: bold; margin: 10px 0; }
+        
+        button {
+            width: 100%; padding: 10px; background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif; cursor: pointer; transition: 0.2s;
+        }
+        button:hover { background: var(--neon-cyan); color: #000; }
+
+        #cart-area h2 { color: var(--neon-purple); font-family: 'Orbitron', sans-serif; border-bottom: 1px solid var(--neon-purple); padding-bottom: 10px; margin-bottom: 20px; }
+        
+        #cart-items { flex: 1; overflow-y: auto; margin-bottom: 20px; }
+        
+        .cart-item {
+            background: #111; border: 1px solid #333; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .cart-item-info h4 { color: white; font-size: 0.9rem; margin-bottom: 2px; }
+        .cart-item-info span { color: gray; font-size: 0.8rem; }
+        .btn-remove { width: auto; padding: 2px 8px; border-color: red; color: red; font-size: 0.8rem; margin-left: 10px; }
+        .btn-remove:hover { background: red; color: white; }
+
+        #cart-total { font-size: 1.5rem; text-align: right; margin-bottom: 20px; color: white; font-weight: bold; }
+        
+        #btn-checkout {
+            background: var(--neon-green); color: black; border: none; font-size: 1.1rem; font-weight: bold; box-shadow: 0 0 10px var(--neon-green);
+        }
+        #btn-checkout:hover { background: #fff; box-shadow: 0 0 20px var(--neon-green); }
+        
+        /* Botón Admin Flotante */
+        .admin-btn { position: fixed; bottom: 20px; left: 20px; width: auto; border-color: var(--neon-purple); color: var(--neon-purple); z-index: 100; background: black; }
+        .admin-btn:hover { background: var(--neon-purple); color: white; }
+
     </style>
 </head>
 <body>
-    <h1>Catálogo de Muebles</h1>
-    <div id="catalogo">Cargando muebles...</div>
+
+    <div id="main-area">
+        <h1>MUEBLERÍA LOS MUEBLES HERMANOS S.A.</h1>
+        <div id="catalogo">CARGANDO MATRIZ DE DATOS...</div>
+    </div>
+
+    <div id="cart-area">
+        <h2>CARRITO</h2>
+        <div id="cart-items">
+            <p style="color: gray; text-align: center;">CARRITO VACÍO</p>
+        </div>
+        
+        <div id="cart-total">TOTAL: $0</div>
+        <button id="btn-checkout" onclick="procesarCompra()">CONFIRMAR VENTA</button>
+    </div>
+
+    <button class="admin-btn" onclick="accesoAdmin()">PANEL ADMIN</button>
 
     <script>
-
         const API_URL = 'http://localhost:8080';
+        
+  
+        let carrito = [];
 
         async function cargarMuebles() {
             try {
-                const response = await fetch(`${API_URL}/api/muebles`);
-                if (!response.ok) throw new Error("Error al conectar con el servidor");
+                const response = await fetch(`${API_URL}/api/muebles/activos`);
                 
-                const muebles = await response.json();
-                const contenedor = document.getElementById('catalogo');
-                contenedor.innerHTML = '';
+                let muebles = [];
+                if (response.status !== 204) {
+                    muebles = await response.json();
+                }
 
-                muebles.forEach(mueble => {
+                const contenedor = document.getElementById('catalogo');
+                contenedor.innerHTML = ''; 
+
+                if(muebles.length === 0) {
+                    contenedor.innerHTML = '<p style="color: white; text-align: center; font-size: 1.2rem;">NO HAY STOCK DISPONIBLE ACTUALMENTE.</p>';
+                    return;
+                }
+
+                muebles.forEach(m => {
                     const div = document.createElement('div');
                     div.className = 'mueble-card';
                     div.innerHTML = `
-                        <h3>${mueble.nombre}</h3>
-                        <p>Tipo: ${mueble.tipo}</p>
-                        <p class="precio">$${mueble.precioBase}</p>
-                        <button onclick="alert('Cotizar ${mueble.id}')">Cotizar</button>
+                        <h3>${m.nombreMueble}</h3>
+                        <p style="font-size:0.9rem; color:#aaa;">${m.tipo} - ${m.tamanio}</p>
+                        <p class="precio">$${m.precioBase}</p>
+                        <button onclick='agregarAlCarrito(${JSON.stringify(m)})'>AGREGAR AL CARRITO</button>
                     `;
                     contenedor.appendChild(div);
                 });
             } catch (error) {
-                document.getElementById('catalogo').innerText = "Error: No se pudo cargar el catálogo. Asegúrate que el Backend esté corriendo.";
                 console.error(error);
+                document.getElementById('catalogo').innerHTML = '<p style="color:red; text-align: center;">ERROR DE CONEXIÓN CON EL SERVIDOR</p>';
             }
+        }
+
+        function agregarAlCarrito(mueble) {
+            carrito.push(mueble);
+            renderizarCarrito();
+        }
+
+        function quitarDelCarrito(index) {
+            carrito.splice(index, 1);
+            renderizarCarrito();
+        }
+
+        function renderizarCarrito() {
+            const contenedor = document.getElementById('cart-items');
+            contenedor.innerHTML = '';
+            let total = 0;
+
+            if (carrito.length === 0) {
+                contenedor.innerHTML = '<p style="color: gray; text-align: center; margin-top: 20px;">VACÍO</p>';
+            } else {
+                carrito.forEach((item, index) => {
+                    total += item.precioBase;
+                    const div = document.createElement('div');
+                    div.className = 'cart-item';
+                    div.innerHTML = `
+                        <div class="cart-item-info">
+                            <h4>${item.nombreMueble}</h4>
+                            <span>$${item.precioBase}</span>
+                        </div>
+                        <button class="btn-remove" onclick="quitarDelCarrito(${index})">X</button>
+                    `;
+                    contenedor.appendChild(div);
+                });
+            }
+            document.getElementById('cart-total').innerText = `TOTAL: $${total}`;
+        }
+
+        async function procesarCompra() {
+            if (carrito.length === 0) {
+                alert("El carrito está vacío.");
+                return;
+            }
+
+            const btn = document.getElementById('btn-checkout');
+            btn.innerText = "PROCESANDO...";
+            btn.disabled = true;
+
+            try {
+                
+                const respCotizacion = await fetch(`${API_URL}/api/cotizaciones`, { method: 'POST' });
+                if (!respCotizacion.ok) throw new Error("Error creando cotización");
+                const cotizacion = await respCotizacion.json();
+                const idCotizacion = cotizacion.idCotizacion;
+
+                for (const item of carrito) {
+                    const detallePayload = {
+                        idMueble: item.idMueble,
+                        cantidad: 1,
+                        idVariante: null 
+                    };
+
+                    await fetch(`${API_URL}/api/cotizaciones/${idCotizacion}/detalles`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(detallePayload)
+                    });
+                }
+
+                const respConfirmar = await fetch(`${API_URL}/api/cotizaciones/${idCotizacion}/confirmar`, { method: 'POST' });
+                
+                if (respConfirmar.ok) {
+                    alert("¡COMPRA EXITOSA! \nStock actualizado en la base de datos.");
+                    carrito = []; 
+                    renderizarCarrito();
+                    cargarMuebles(); 
+                } else {
+                
+                    const errorMsg = await respConfirmar.text();
+                    alert("Error al confirmar venta: " + errorMsg);
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert("Ocurrió un error durante la compra.");
+            } finally {
+                btn.innerText = "CONFIRMAR VENTA";
+                btn.disabled = false;
+            }
+        }
+
+        function accesoAdmin() {
+            const pass = prompt("PASSWORD:");
+            if (pass === "admin123") window.location.href = "admin.html";
         }
 
         cargarMuebles();
