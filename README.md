@@ -25,6 +25,8 @@ El proyecto se orquesta mediante `docker-compose`, levantando 3 servicios interc
 2.  **`backend`**: API RESTful con lógica de negocio (Puerto 8080).
 3.  **`frontend`**: Interfaz de Usuario servida por Nginx (Puerto 3000).
 
+---
+
 ## Instrucciones de Ejecución y Despliegue
 
 Requisitos Previos
